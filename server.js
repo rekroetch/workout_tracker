@@ -16,7 +16,16 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
+
+mongoose.connect(
+    process.env.MONGODB_URI || 'mongodb://localhost/workout',
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false
+    }
+);
 
 // HTML Routes
 app.get("/", (req, res) => {
@@ -42,6 +51,7 @@ app.get("/api/workouts", (req, res) => {
     });
 });
 
+// do I need this?
 app.get("/api/workouts/range", (req, res) => {
   db.Workout.find({})
     .then(dbWorkout => {
@@ -52,7 +62,6 @@ app.get("/api/workouts/range", (req, res) => {
     });
 });
 
-// this works
 app.put("/api/workouts/:id", (req, res) => {
     db.Workout.findByIdAndUpdate(
         { _id: req.params.id },
@@ -80,5 +89,5 @@ app.post("/api/workouts", ({ body }, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
+  console.log(`App running on http://localhost:${PORT}`);
 });
