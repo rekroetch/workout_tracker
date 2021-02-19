@@ -18,14 +18,7 @@ app.use(express.static("public"));
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
 
-// db.User.create({ name: "Ernest Hemingway" })
-//   .then(dbUser => {
-//     console.log(dbUser);
-//   })
-//   .catch(({ message }) => {
-//     console.log(message);
-//   });
-
+// HTML Routes
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "./public/index.html"));
 });
@@ -38,16 +31,7 @@ app.get("/stats", (req, res) => {
     res.sendFile(path.join(__dirname, "./public/stats.html"));
 });
 
-// app.get("/exercise", (req, res) => {
-//   db.Workout.find({})
-//     .then(dbWorkout => {
-//       res.json(dbWorkout);
-//     })
-//     .catch(err => {
-//       res.json(err);
-//     });
-// });
-
+// Api Routes
 app.get("/api/workouts", (req, res) => {
   db.Workout.find({})
     .then(dbWorkout => {
@@ -70,10 +54,20 @@ app.get("/api/workouts/range", (req, res) => {
 
 
 
-app.put("/api/workouts/:id", (req, res) => {
+app.put("/api/workouts/:id", ({ body }, res) => {
     db.Workout.update(
-        { _id: req.params.id },
-        { $set: { exercises: req.body } },
+        console.log(body),
+        { _id: body.id },
+        { $set: { exercises: 
+            {
+                type: body.type,
+                name: body.name,
+                duration: body.duration,
+                weight: body.weight,
+                reps: body.reps,
+                sets: body.sets,
+                distance: body.distance
+            } } },
 
         (error, edited) => {
             if (error) {
@@ -93,9 +87,28 @@ app.put("/api/workouts/:id", (req, res) => {
     // });
 });
 
+// app.post("/api/workouts", ({ body }, res) => {
+//   db.Workout.create(body)
+//     .then(() => db.Workout.findOneAndUpdate({}, { $set: { exercises: req.body } }))
+//     .then(dbWorkout => {
+//       res.json(dbWorkout);
+//     })
+//     .catch(err => {
+//       res.json(err);
+//     });
+// });
+
 app.post("/api/workouts", ({ body }, res) => {
-  db.Workout.create(body)
-    .then(({ _id }) => db.Workout.findOneAndUpdate({}, { $set: { exercises: req.body } }))
+  db.Workout.create(
+        {
+            type: body.type,
+            name: body.name,
+            duration: body.duration,
+            weight: body.weight,
+            reps: body.reps,
+            sets: body.sets,
+            distance: body.distance
+        })
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
