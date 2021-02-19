@@ -52,70 +52,32 @@ app.get("/api/workouts/range", (req, res) => {
     });
 });
 
-
-
-app.put("/api/workouts/:id", ({ body }, res) => {
-    db.Workout.update(
-        console.log(body),
-        { _id: body.id },
-        { $set: { exercises: 
-            {
-                type: body.type,
-                name: body.name,
-                duration: body.duration,
-                weight: body.weight,
-                reps: body.reps,
-                sets: body.sets,
-                distance: body.distance
-            } } },
-
-        (error, edited) => {
-            if (error) {
-            console.log(error);
-            res.send(error);
-            } else {
-            console.log(edited);
-            res.send(edited);
-            }
-        }
-    );
-    // .then(dbWorkout => {
-    //   res.json(dbWorkout);
-    // })
-    // .catch(err => {
-    //   res.json(err);
-    // });
-});
-
-// app.post("/api/workouts", ({ body }, res) => {
-//   db.Workout.create(body)
-//     .then(() => db.Workout.findOneAndUpdate({}, { $set: { exercises: req.body } }))
-//     .then(dbWorkout => {
-//       res.json(dbWorkout);
-//     })
-//     .catch(err => {
-//       res.json(err);
-//     });
-// });
-
-app.post("/api/workouts", ({ body }, res) => {
-  db.Workout.create(
-        {
-            type: body.type,
-            name: body.name,
-            duration: body.duration,
-            weight: body.weight,
-            reps: body.reps,
-            sets: body.sets,
-            distance: body.distance
-        })
+// this works
+app.put("/api/workouts/:id", (req, res) => {
+    db.Workout.findByIdAndUpdate(
+        { _id: req.params.id },
+        { $push: { exercises: req.body } },
+        { new: true }
+    )
     .then(dbWorkout => {
-      res.json(dbWorkout);
+        res.json(dbWorkout)
     })
     .catch(err => {
-      res.json(err);
+        res.json(err)
+    });
+
+});
+
+app.post("/api/workouts", ({ body }, res) => {
+    db.Workout.create(body)
+    .then(dbWorkout => {
+        res.json(dbWorkout);
+    })
+    .catch(err => {
+        res.json(err);
     });
 });
+
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
